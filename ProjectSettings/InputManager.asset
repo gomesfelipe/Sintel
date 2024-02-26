@@ -133,7 +133,7 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 351f2ccd-1f9f-44bf-9bec-d62ac5c5f408
-      m_Processors: 
+      m_Processors: NormalizeVector2
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 1
@@ -141,7 +141,7 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 6b444451-8a00-4d00-a97e-f47457f736a8
-      m_Processors: 
+      m_Processors: NormalizeVector2
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 1
@@ -206,7 +206,7 @@ MonoBehaviour:
       m_Id: 978bfe49-cc26-4a3d-ab7b-7d7a29327403
       m_Path: <Gamepad>/leftStick
       m_Interactions: 
-      m_Processors: 
+      m_Processors: StickDeadzone
       m_Groups: ;Gamepad
       m_Action: Move
       m_Flags: 0
@@ -294,7 +294,7 @@ MonoBehaviour:
       m_Id: 3ea4d645-4504-4529-b061-ab81934c3752
       m_Path: <Joystick>/stick
       m_Interactions: 
-      m_Processors: 
+      m_Processors: StickDeadzone
       m_Groups: Joystick
       m_Action: Move
       m_Flags: 0
@@ -302,7 +302,7 @@ MonoBehaviour:
       m_Id: c1f7a91b-d0fd-4a62-997e-7fb9b69bf235
       m_Path: <Gamepad>/rightStick
       m_Interactions: 
-      m_Processors: 
+      m_Processors: StickDeadzone
       m_Groups: ;Gamepad
       m_Action: Look
       m_Flags: 0
@@ -927,6 +927,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Asset: {fileID: -4310300311464935602}
   m_ActionId: 15cef263-9014-4fd5-94d9-4e4a6234a6ef
+--- !u!114 &-2491611259567810560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
+  m_Name: Player/Attack
+  m_EditorClassIdentifier: 
+  m_Asset: {fileID: -4310300311464935602}
+  m_ActionId: 6c2ab1b8-8984-453a-af3d-a3c78ae1679a
 --- !u!114 &-2135672740423732633
 MonoBehaviour:
   m_ObjectHideFlags: 0
