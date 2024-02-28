@@ -8,28 +8,36 @@ public class PlayerLocomotion : MonoBehaviour
 {
     protected Rigidbody _rb;
     [SerializeField] protected Animator _anim;
+    private CapsuleCollider _collider;
     public Vector2 _move, _look;
     protected Vector3 moveDirection = Vector3.zero;
     public float aimValue, fireValue;
 
     public float rotationPower = 3f, rotationLerp = 0.5f;
 
-    public float moveSpeed = 5f, rotationSpeed = 500f, burstSpeed;
+    public float moveSpeed = 5f, sprintSpeed = 8f, rotationSpeed = 500f, burstSpeed;
     public GameObject followTransform;
 
-    public GameObject projectile;
+    private bool isCrouching = false; // Agachamento
+    private float originalColliderHeight; // Altura original do collider
+    private Vector3 originalColliderCenter; // Centro original do collider
 
+    public float jumpForce = 5f;
+    private bool isGrounded;
+    public LayerMask groundLayer;
+    public float groundCheckDistance = 0.2f;
+
+    public GameObject projectile;
     private bool m_Charging;
 
-    public float jumpForce = 5f; // Força do pulo
-    private bool isGrounded; // Verifica se o jogador está no chão
-    public LayerMask groundLayer; // Camada do chão para verificação
-    public float groundCheckDistance = 0.2f; // Distância para verificar se está no chão
-
+    private bool isSprinting = false; // Controle do sprint
     private void Awake()
     {
         _rb ??= GetComponent<Rigidbody>();
         _anim = GetComponentInChildren<Animator>();
+        _collider ??= GetComponent<CapsuleCollider>();
+        originalColliderHeight = _collider.height;
+        originalColliderCenter = _collider.center;
     }
     private void FixedUpdate()
     {
@@ -48,11 +56,26 @@ public class PlayerLocomotion : MonoBehaviour
         _look = context.ReadValue<Vector2>();
     }
 
+    public void OnSprint(InputAction.CallbackContext context)
+    {
+        isSprinting = context.performed;
+        //_anim.SetBool("IsSprinting", isSprinting);
+    }
+
     public void OnJump(InputAction.CallbackContext context)
     {
         if (context.performed && isGrounded)
         {
+            _anim.SetTrigger("Jumping");
             _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        }
+    }
+
+    public void OnCrouch(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            ToggleCrouch();
         }
     }
 
@@ -92,32 +115,34 @@ public class PlayerLocomotion : MonoBehaviour
 
     private void HandleMovement()
     {
-        if (_move.x == 0 && _move.y == 0 || _move.sqrMagnitude < 0.01) 
+        float currentSpeed = isSprinting ? sprintSpeed : moveSpeed;
+
+        if (_move.sqrMagnitude < 0.01)
         {
-            moveDirection = Vector3.zero; // Garante que a direção do movimento é zerada quando não há entrada
+            moveDirection = Vector3.zero;
+            _anim.SetFloat("Speed", 0); // Idle
             return;
         }
+
         Vector3 forward = Camera.main.transform.forward;
         Vector3 right = Camera.main.transform.right;
-
-        // Zero out the y component of the camera's forward and right vectors to keep the movement strictly horizontal
         forward.y = 0;
         right.y = 0;
         forward.Normalize();
         right.Normalize();
 
-        // Calcula a dire��o de movimento relativa � c�mera
         moveDirection = ((forward * _move.y) + (right * _move.x)).normalized;
 
-        _rb.MovePosition(_rb.position + (moveSpeed * Time.fixedDeltaTime * moveDirection));
+        _rb.MovePosition(_rb.position + (currentSpeed * Time.fixedDeltaTime * moveDirection));
 
         if (moveDirection != Vector3.zero)
         {
             Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
+            _rb.rotation = Quaternion.RotateTowards(_rb.rotation, toRotation, rotationSpeed * Time.deltaTime);
         }
 
-        _anim.SetFloat("Speed", moveDirection.magnitude);
+        // Ajusta o valor de Speed no Animator com base no estado de sprint
+        _anim.SetFloat("Speed", isSprinting ? 1.0f : (_move.sqrMagnitude > 0 ? 0.5f : 0f)); // 1 para sprint, 0.5 para andar
     }
 
     private void HandleRotation()
@@ -128,9 +153,33 @@ public class PlayerLocomotion : MonoBehaviour
         _rb.rotation = Quaternion.Slerp(_rb.rotation, targetRotation, rotationLerp * Time.fixedDeltaTime);
     }
 
+    private void ToggleCrouch()
+    {
+        isCrouching = !isCrouching;
+        _anim.SetBool("IsCrouching", isCrouching);
+
+        if (isCrouching)
+        {
+            // Reduzir a altura do collider pela metade ao agachar
+            _collider.height = originalColliderHeight / 2;
+            _collider.center = new Vector3(originalColliderCenter.x, originalColliderCenter.y / 2, originalColliderCenter.z);
+        }
+        else
+        {
+            // Restaurar a altura original do collider ao levantar
+            _collider.height = originalColliderHeight;
+            _collider.center = originalColliderCenter;
+        }
+    }
+
     private void CheckGroundStatus()
     {
-        isGrounded = Physics.Raycast(transform.position, -Vector3.up, groundCheckDistance, groundLayer);
+        Vector3 rayStart = transform.position + Vector3.up * 0.1f; // Ajusta levemente para cima para evitar colisão com o próprio jogador
+        bool hitGround = Physics.Raycast(rayStart, -Vector3.up, out RaycastHit hit, groundCheckDistance, groundLayer);
+        Debug.DrawRay(rayStart, -Vector3.up * groundCheckDistance, hitGround ? Color.green : Color.red);
+
+        isGrounded = hitGround;
+        _anim.SetBool("IsGrounded", isGrounded);
     }
 
 
@@ -145,15 +194,6 @@ public class PlayerLocomotion : MonoBehaviour
 
     private void Fire()
     {
-        var transform = this.transform;
-        var newProjectile = Instantiate(projectile);
-        newProjectile.transform.position = transform.position + transform.forward * 0.6f;
-        newProjectile.transform.rotation = transform.rotation;
-        const int size = 1;
-        newProjectile.transform.localScale *= size;
-        newProjectile.GetComponent<Rigidbody>().mass = Mathf.Pow(size, 3);
-        newProjectile.GetComponent<Rigidbody>().AddForce(transform.forward * 20f, ForceMode.Impulse);
-        newProjectile.GetComponent<MeshRenderer>().material.color =
-            new Color(Random.value, Random.value, Random.value, 1.0f);
+
     }
 }

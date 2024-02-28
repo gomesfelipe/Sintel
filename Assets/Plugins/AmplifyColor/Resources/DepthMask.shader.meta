@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 91ab9eda50e124647a3851a996917df9
+timeCreated: 1437683618
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 1894
+  packageName: Amplify Color
+  packageVersion: 1.8.2
+  assetPath: Assets/AmplifyColor/Resources/DepthMask.shader
+  uploadId: 369128

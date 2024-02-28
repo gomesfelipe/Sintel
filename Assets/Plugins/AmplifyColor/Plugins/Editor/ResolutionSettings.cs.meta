@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 1359f2bc92c6caf4db87f92cb2e0e0e9
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+AssetOrigin:
+  serializedVersion: 1
+  productId: 1894
+  packageName: Amplify Color
+  packageVersion: 1.8.2
+  assetPath: Assets/AmplifyColor/Plugins/Editor/ResolutionSettings.cs
+  uploadId: 369128

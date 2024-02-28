@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 7b4fc7d9717fb1f48821f596ddd2fff0
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+AssetOrigin:
+  serializedVersion: 1
+  productId: 1894
+  packageName: Amplify Color
+  packageVersion: 1.8.2
+  assetPath: Assets/AmplifyColor/Plugins/Editor/PhotoshopTouchHelper.cs
+  uploadId: 369128

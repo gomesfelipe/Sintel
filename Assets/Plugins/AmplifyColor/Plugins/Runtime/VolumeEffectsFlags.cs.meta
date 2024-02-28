@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0b8c14f1da8837b42bc65996a3507400
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+AssetOrigin:
+  serializedVersion: 1
+  productId: 1894
+  packageName: Amplify Color
+  packageVersion: 1.8.2
+  assetPath: Assets/AmplifyColor/Plugins/Runtime/VolumeEffectsFlags.cs
+  uploadId: 369128

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 98653e2840386544bab0f9ac48776ee6
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 1894
+  packageName: Amplify Color
+  packageVersion: 1.8.2
+  assetPath: Assets/AmplifyColor/Plugins/AmplifyColorRenderMask.cs
+  uploadId: 369128
