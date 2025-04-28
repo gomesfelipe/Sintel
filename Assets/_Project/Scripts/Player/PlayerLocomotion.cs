@@ -12,7 +12,6 @@ public class PlayerLocomotion : MonoBehaviour
     protected Rigidbody _rb;
     [SerializeField] protected Animator _anim;
     private CapsuleCollider _collider;
-    public Vector2 _move, _look;
     protected Vector3 moveDirection = Vector3.zero;
     public float rotationPower = 3f, rotationLerp = 0.5f;
     public float moveSpeed = 5f, sprintSpeed = 8f, rotationSpeed = 500f;
@@ -74,22 +73,15 @@ public class PlayerLocomotion : MonoBehaviour
         right.Normalize();
 
         moveDirection = ((forward * _inputHandler.Move.y) + (right * _inputHandler.Move.x)).normalized;
-
         _rb.MovePosition(_rb.position + (currentSpeed * Time.fixedDeltaTime * moveDirection));
-
-        if (moveDirection != Vector3.zero)
-        {
-            Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-            _rb.rotation = Quaternion.RotateTowards(_rb.rotation, toRotation, rotationSpeed * Time.deltaTime);
-        }
         _anim.SetFloat(AnimatorParams.Speed, isSprinting ? 1.0f : (_inputHandler.Move.sqrMagnitude > 0 ? 0.5f : 0f)); // 1 to sprint, 0.5 to walk
     }
 
     private void HandleRotation()
     {
         if (moveDirection == Vector3.zero) return;
-        Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-        _rb.rotation = Quaternion.Slerp(_rb.rotation, targetRotation, rotationLerp * Time.fixedDeltaTime);
+        Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+        _rb.rotation = Quaternion.RotateTowards(_rb.rotation, toRotation, rotationSpeed * Time.deltaTime);
     }
 
     private void HandleJump()

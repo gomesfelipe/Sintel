@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: eaa3efb5e23d10446baab98c00cc31f1
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 1894
+  packageName: Amplify Color
+  packageVersion: 1.9.0
+  assetPath: Assets/Plugins/AmplifyColor/Samples/Simple.unity
+  uploadId: 687712

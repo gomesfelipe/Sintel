@@ -58,6 +58,6 @@ AssetOrigin:
   serializedVersion: 1
   productId: 1894
   packageName: Amplify Color
-  packageVersion: 1.8.2
-  assetPath: Assets/AmplifyColor/Samples/Premium/B&W High Contrast Old.png
-  uploadId: 369128
+  packageVersion: 1.9.0
+  assetPath: Assets/Plugins/AmplifyColor/Samples/Premium/B&W High Contrast Old.png
+  uploadId: 687712
