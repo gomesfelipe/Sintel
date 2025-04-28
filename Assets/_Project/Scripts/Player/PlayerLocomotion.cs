@@ -1,21 +1,21 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Interactions;
 
-[RequireComponent(typeof(CapsuleCollider),typeof(Rigidbody))] 
+[RequireComponent(typeof(CapsuleCollider), typeof(Rigidbody))]
 public class PlayerLocomotion : MonoBehaviour
 {
+    [SerializeField] protected InputHandler _inputHandler;
+    protected Camera _camera;
     protected Rigidbody _rb;
     [SerializeField] protected Animator _anim;
     private CapsuleCollider _collider;
     public Vector2 _move, _look;
     protected Vector3 moveDirection = Vector3.zero;
-    public float aimValue, fireValue;
-
     public float rotationPower = 3f, rotationLerp = 0.5f;
-
-    public float moveSpeed = 5f, sprintSpeed = 8f, rotationSpeed = 500f, burstSpeed;
+    public float moveSpeed = 5f, sprintSpeed = 8f, rotationSpeed = 500f;
     public GameObject followTransform;
 
     private bool isCrouching = false; // Agachamento
@@ -27,111 +27,53 @@ public class PlayerLocomotion : MonoBehaviour
     public LayerMask groundLayer;
     public float groundCheckDistance = 0.2f;
 
-    public GameObject projectile;
-    private bool m_Charging;
-
-    private bool isSprinting = false; // Controle do sprint
+    private bool isSprinting = false; 
     private void Awake()
     {
+        _inputHandler ??= GetComponent<InputHandler>();
+        _camera ??= Camera.main;
         _rb ??= GetComponent<Rigidbody>();
-        _anim = GetComponentInChildren<Animator>();
+        _anim ??= GetComponentInChildren<Animator>();
         _collider ??= GetComponent<CapsuleCollider>();
         originalColliderHeight = _collider.height;
         originalColliderCenter = _collider.center;
     }
     private void FixedUpdate()
     {
-        HandleMovement();
-        HandleRotation();
+        HandleActions();
         CheckGroundStatus();
     }
-
-    public void OnMove(InputAction.CallbackContext context)
+    protected void HandleActions()
     {
-        _move = context.ReadValue<Vector2>();
-    }
-
-    public void OnLook(InputAction.CallbackContext context)
-    {
-        _look = context.ReadValue<Vector2>();
-    }
-
-    public void OnSprint(InputAction.CallbackContext context)
-    {
-        isSprinting = context.performed;
-        //_anim.SetBool("IsSprinting", isSprinting);
-    }
-
-    public void OnJump(InputAction.CallbackContext context)
-    {
-        if (context.performed && isGrounded)
-        {
-            _anim.SetTrigger("Jumping");
-            _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        }
-    }
-
-    public void OnCrouch(InputAction.CallbackContext context)
-    {
-        if (context.performed)
+        HandleMovement();
+        HandleRotation();
+        HandleJump();
+        if (_inputHandler.CrouchPressed)
         {
             ToggleCrouch();
         }
+
     }
-
-    public void OnFire(InputAction.CallbackContext context)
-    {
-        switch (context.phase)
-        {
-            case InputActionPhase.Performed:
-                if (context.interaction is SlowTapInteraction)
-                {
-                    StartCoroutine(BurstFire((int)(context.duration * burstSpeed)));
-                }
-                else
-                {
-                    Fire();
-                }
-                m_Charging = false;
-                break;
-
-            case InputActionPhase.Started:
-                if (context.interaction is SlowTapInteraction)
-                    m_Charging = true;
-                break;
-
-            case InputActionPhase.Canceled:
-                m_Charging = false;
-                break;
-        }
-    }
-
-    public void OnGUI()
-    {
-        if (m_Charging)
-            GUI.Label(new Rect(100, 100, 200, 100), "Charging...");
-    }
-
 
     private void HandleMovement()
     {
         float currentSpeed = isSprinting ? sprintSpeed : moveSpeed;
 
-        if (_move.sqrMagnitude < 0.01)
+        if (_inputHandler.Move.sqrMagnitude < 0.01)
         {
             moveDirection = Vector3.zero;
-            _anim.SetFloat("Speed", 0); // Idle
+            _anim.SetFloat(AnimatorParams.Speed, 0); // Idle
             return;
         }
 
-        Vector3 forward = Camera.main.transform.forward;
-        Vector3 right = Camera.main.transform.right;
+        Vector3 forward = _camera.transform.forward;
+        Vector3 right = _camera.transform.right;
         forward.y = 0;
         right.y = 0;
         forward.Normalize();
         right.Normalize();
 
-        moveDirection = ((forward * _move.y) + (right * _move.x)).normalized;
+        moveDirection = ((forward * _inputHandler.Move.y) + (right * _inputHandler.Move.x)).normalized;
 
         _rb.MovePosition(_rb.position + (currentSpeed * Time.fixedDeltaTime * moveDirection));
 
@@ -140,17 +82,23 @@ public class PlayerLocomotion : MonoBehaviour
             Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
             _rb.rotation = Quaternion.RotateTowards(_rb.rotation, toRotation, rotationSpeed * Time.deltaTime);
         }
-
-        // Ajusta o valor de Speed no Animator com base no estado de sprint
-        _anim.SetFloat("Speed", isSprinting ? 1.0f : (_move.sqrMagnitude > 0 ? 0.5f : 0f)); // 1 para sprint, 0.5 para andar
+        _anim.SetFloat(AnimatorParams.Speed, isSprinting ? 1.0f : (_inputHandler.Move.sqrMagnitude > 0 ? 0.5f : 0f)); // 1 to sprint, 0.5 to walk
     }
 
     private void HandleRotation()
     {
-        if (moveDirection == Vector3.zero) return; // Não rotaciona se não há direção de movimento
-
+        if (moveDirection == Vector3.zero) return;
         Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
         _rb.rotation = Quaternion.Slerp(_rb.rotation, targetRotation, rotationLerp * Time.fixedDeltaTime);
+    }
+
+    private void HandleJump()
+    {
+        if (_inputHandler.JumpPressed && isGrounded)
+        {
+            _anim.SetTrigger(AnimatorParams.Jumping);
+            _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        }
     }
 
     private void ToggleCrouch()
@@ -179,21 +127,6 @@ public class PlayerLocomotion : MonoBehaviour
         Debug.DrawRay(rayStart, -Vector3.up * groundCheckDistance, hitGround ? Color.green : Color.red);
 
         isGrounded = hitGround;
-        _anim.SetBool("IsGrounded", isGrounded);
-    }
-
-
-    private IEnumerator BurstFire(int burstAmount)
-    {
-        for (var i = 0; i < burstAmount; ++i)
-        {
-            Fire();
-            yield return new WaitForSeconds(0.1f);
-        }
-    }
-
-    private void Fire()
-    {
-
+        _anim.SetBool(AnimatorParams.IsGrounded, isGrounded);
     }
 }
