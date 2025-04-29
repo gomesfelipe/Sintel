@@ -126,6 +126,7 @@ GameObject:
   - component: {fileID: 180687504832944842}
   - component: {fileID: 5287813658138517945}
   - component: {fileID: 6382720934198574392}
+  - component: {fileID: 4605842961224480890}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -370,7 +371,19 @@ MonoBehaviour:
     m_ActionId: 915b377c-cd05-4492-9f6d-078d2f7ce194
     m_ActionName: 'Player/Crouch[/Keyboard/ctrl]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 180687504832944842}
+        m_TargetAssemblyTypeName: InputHandler, Assembly-CSharp
+        m_MethodName: OnInteract
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 8c9fd459-1262-4f6f-9e85-7e705a0fed33
     m_ActionName: 'Player/Interact[/Keyboard/e]'
   - m_PersistentCalls:
@@ -418,6 +431,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 938e5850e72b8c24d8de3dcc4367aa4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  interactionDistance: 2
+  capsuleRadius: 0.4
+  interactableLayer:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!114 &6382720934198574392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -432,6 +450,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _inputHandler: {fileID: 180687504832944842}
   _anim: {fileID: 5032534029758302025}
+  CanMove: 1
   rotationPower: 3
   rotationLerp: 0.5
   moveSpeed: 5
@@ -439,10 +458,31 @@ MonoBehaviour:
   rotationSpeed: 500
   followTransform: {fileID: 13369520708453491}
   jumpForce: 2
+  groundCheckDistance: 0.2
   groundLayer:
     serializedVersion: 2
     m_Bits: 1
-  groundCheckDistance: 0.2
+--- !u!114 &4605842961224480890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2967622722847986390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f4b9cdc417500448b17647c67df46e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  torchVisual: {fileID: 1820252342082958038}
+  inputHandler: {fileID: 180687504832944842}
+  animator: {fileID: 5032534029758302025}
+  hasTorch: 1
+  torchActive: 0
+  maxFuel: 100
+  fuelConsumptionRate: 5
+  attackFuelCost: 10
+  burnEffectiveness: 1
 --- !u!1 &7047530577357938383
 GameObject:
   m_ObjectHideFlags: 0
@@ -3188,7 +3228,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: fd5ff891066137f4b937e74eebf54b97,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5689311127157651668, guid: fd5ff891066137f4b937e74eebf54b97,
         type: 3}
@@ -3207,6 +3247,12 @@ PrefabInstance:
 --- !u!4 &1299575950125377644 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: fd5ff891066137f4b937e74eebf54b97,
+    type: 3}
+  m_PrefabInstance: {fileID: 1550289463171633031}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1820252342082958038 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: fd5ff891066137f4b937e74eebf54b97,
     type: 3}
   m_PrefabInstance: {fileID: 1550289463171633031}
   m_PrefabAsset: {fileID: 0}

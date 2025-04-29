@@ -7,6 +7,15 @@ public class PlayerManager : MonoBehaviour
     public Animator Animator { get; private set; }
     public CapsuleCollider Collider { get; private set; }
     public InputHandler InputHandler { get; private set; }
+    public TorchController TorchController { get; private set; }
+
+    [Header("Interaction")]
+    public float interactionDistance = 2f;
+    public float capsuleRadius = 0.4f;
+    public LayerMask interactableLayer;
+    private IInteractable currentTarget;
+    private Vector3 targetPoint;
+    private Transform _playerTransform;
 
     [Header("States")]
     public bool IsGrounded { get; set; }
@@ -23,5 +32,63 @@ public class PlayerManager : MonoBehaviour
         Animator ??= GetComponentInChildren<Animator>();
         Collider ??= GetComponent<CapsuleCollider>();
         InputHandler ??= GetComponent<InputHandler>();
+        TorchController ??= GetComponent<TorchController>();
+        _playerTransform = transform;
+    }
+
+    private void Update()
+    {
+        DetectInteractable();
+
+        if (InputHandler != null && InputHandler.InteractPressed)
+        {
+            TryInteract();
+        }
+    }
+
+    private void DetectInteractable()
+    {
+        Vector3 baseOrigin = _playerTransform.position + Vector3.up * 0.1f;
+        Vector3 topOrigin = _playerTransform.position + Vector3.up * 1.5f;
+        Vector3 direction = _playerTransform.forward;
+
+        if (Physics.CapsuleCast(baseOrigin, topOrigin, capsuleRadius, direction, out RaycastHit hit, interactionDistance, interactableLayer))
+        {
+            currentTarget = hit.collider.GetComponent<IInteractable>();
+            targetPoint = hit.point;
+        }
+        else
+        {
+            currentTarget = null;
+        }
+    }
+
+    private void TryInteract()
+    {
+        if (currentTarget == null) return;
+
+        if (TorchController != null && TorchController.IsTorchActive() && TorchController.HasFuel())
+        {
+            if (currentTarget is IBurnable burnable)
+            {
+                burnable.StartBurn();
+                Debug.Log("The object started burning!");
+                return;
+            }
+        }
+
+        currentTarget.OnInteract();
+        Debug.Log("Interact");
+    }
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying) return;
+
+        if (currentTarget != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawSphere(targetPoint, 0.2f);
+            Gizmos.DrawLine(_playerTransform.position + Vector3.up * 0.1f, targetPoint);
+        }
     }
 }
