@@ -12,21 +12,20 @@ public class PlayerLocomotion : MonoBehaviour
     protected Rigidbody _rb;
     [SerializeField] protected Animator _anim;
     private CapsuleCollider _collider;
+    public bool CanMove = true;
     protected Vector3 moveDirection = Vector3.zero;
     public float rotationPower = 3f, rotationLerp = 0.5f;
     public float moveSpeed = 5f, sprintSpeed = 8f, rotationSpeed = 500f;
     public GameObject followTransform;
 
-    private bool isCrouching = false; // Agachamento
+    private bool isSprinting = false, isCrouching = false;
     private float originalColliderHeight; // Altura original do collider
     private Vector3 originalColliderCenter; // Centro original do collider
 
-    public float jumpForce = 5f;
+    public float jumpForce = 5f, groundCheckDistance = 0.2f;
     private bool isGrounded;
     public LayerMask groundLayer;
-    public float groundCheckDistance = 0.2f;
 
-    private bool isSprinting = false; 
     private void Awake()
     {
         _inputHandler ??= GetComponent<InputHandler>();
@@ -56,6 +55,7 @@ public class PlayerLocomotion : MonoBehaviour
 
     private void HandleMovement()
     {
+        if (!CanMove) { return; }
         float currentSpeed = isSprinting ? sprintSpeed : moveSpeed;
 
         if (_inputHandler.Move.sqrMagnitude < 0.01)
