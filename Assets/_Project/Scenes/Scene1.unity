@@ -3995,16 +3995,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 5032534029758302025, guid: 52391d7878090654399ff9bcecb0c20c,
-        type: 3}
-      propertyPath: m_WarningMessage
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 5270012804958825757, guid: 52391d7878090654399ff9bcecb0c20c,
-        type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5366689185282096000, guid: 52391d7878090654399ff9bcecb0c20c,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4060,10 +4050,15 @@ PrefabInstance:
       propertyPath: m_UIInputModule
       value: 
       objectReference: {fileID: 320878951}
-    - target: {fileID: 8930565418725790230, guid: 52391d7878090654399ff9bcecb0c20c,
+    - target: {fileID: 6382720934198574392, guid: 52391d7878090654399ff9bcecb0c20c,
         type: 3}
-      propertyPath: m_Enabled
-      value: 0
+      propertyPath: crouchedHeight
+      value: 1.26
+      objectReference: {fileID: 0}
+    - target: {fileID: 6382720934198574392, guid: 52391d7878090654399ff9bcecb0c20c,
+        type: 3}
+      propertyPath: crouchedCenterY
+      value: 0.44
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

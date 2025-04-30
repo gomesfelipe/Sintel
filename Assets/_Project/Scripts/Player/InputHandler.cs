@@ -56,4 +56,8 @@ public class InputHandler : MonoBehaviour
     {
         FirePressed = false;
     }
+    public void ClearCrouch()
+    {
+        CrouchPressed = false;
+    }
 }

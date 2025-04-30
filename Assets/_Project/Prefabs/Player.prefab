@@ -160,7 +160,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2967622722847986390}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 9000000, guid: 33d9713335ba8a9418671006eabeaca1, type: 3}
   m_Controller: {fileID: 9100000, guid: d7305664a3b4a384d909641ae8bae81a, type: 2}
   m_CullingMode: 0
@@ -474,6 +474,7 @@ MonoBehaviour:
   rotationPower: 3
   rotationLerp: 0.5
   moveSpeed: 5
+  crouchSpeed: 2
   sprintSpeed: 8
   rotationSpeed: 500
   followTransform: {fileID: 13369520708453491}
@@ -1820,6 +1821,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 6746227425943427013, guid: 33d9713335ba8a9418671006eabeaca1,
+        type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6849891588755472232, guid: 33d9713335ba8a9418671006eabeaca1,
         type: 3}
       propertyPath: m_Layer
@@ -2170,7 +2176,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1764526433541195657}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b2d8418b0b9634b1892b0268dd9c2743, type: 3}
   m_Name: 

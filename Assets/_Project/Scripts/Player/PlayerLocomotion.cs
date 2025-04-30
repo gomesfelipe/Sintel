@@ -15,12 +15,16 @@ public class PlayerLocomotion : MonoBehaviour
     public bool CanMove = true;
     protected Vector3 moveDirection = Vector3.zero;
     public float rotationPower = 3f, rotationLerp = 0.5f;
-    public float moveSpeed = 5f, sprintSpeed = 8f, rotationSpeed = 500f;
+    public float moveSpeed = 5f, crouchSpeed=2f, sprintSpeed = 8f, rotationSpeed = 500f;
     public GameObject followTransform;
 
     private bool isSprinting = false, isCrouching = false;
-    private float originalColliderHeight; // Altura original do collider
-    private Vector3 originalColliderCenter; // Centro original do collider
+    private bool crouchToggledThisFrame = false;
+    private float originalColliderHeight;
+    [SerializeField] private float crouchedHeight = 0.875f;
+    [SerializeField] private float crouchedCenterY = 0.4425f;
+    private Vector3 originalColliderCenter;
+    private Coroutine crouchCoroutine;
 
     public float jumpForce = 5f, groundCheckDistance = 0.2f;
     private bool isGrounded;
@@ -46,17 +50,18 @@ public class PlayerLocomotion : MonoBehaviour
         HandleMovement();
         HandleRotation();
         HandleJump();
-        if (_inputHandler.CrouchPressed)
+        if (_inputHandler.CrouchPressed && !crouchToggledThisFrame)
         {
             ToggleCrouch();
+            crouchToggledThisFrame = true;
+            _inputHandler.ClearCrouch();
         }
-
     }
 
     private void HandleMovement()
     {
         if (!CanMove) { return; }
-        float currentSpeed = isSprinting ? sprintSpeed : moveSpeed;
+        float currentSpeed = isSprinting ? sprintSpeed : isCrouching ? crouchSpeed : moveSpeed;
 
         if (_inputHandler.Move.sqrMagnitude < 0.01)
         {
@@ -96,25 +101,38 @@ public class PlayerLocomotion : MonoBehaviour
     private void ToggleCrouch()
     {
         isCrouching = !isCrouching;
-        _anim.SetBool("IsCrouching", isCrouching);
+        _anim.SetBool(AnimatorParams.IsCrouching, isCrouching);
 
-        if (isCrouching)
+        if (crouchCoroutine != null)
+            StopCoroutine(crouchCoroutine);
+
+        float targetHeight = isCrouching ? crouchedHeight : originalColliderHeight;
+        Vector3 targetCenter = isCrouching
+            ? new Vector3(originalColliderCenter.x, crouchedCenterY, originalColliderCenter.z)
+            : originalColliderCenter;
+
+        crouchCoroutine = StartCoroutine(SmoothCrouchTransition(_collider.height, targetHeight, _collider.center, targetCenter, 0.15f));
+    }
+
+    private IEnumerator SmoothCrouchTransition(float startHeight, float endHeight, Vector3 startCenter, Vector3 endCenter, float duration)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
         {
-            // Reduzir a altura do collider pela metade ao agachar
-            _collider.height = originalColliderHeight / 2;
-            _collider.center = new Vector3(originalColliderCenter.x, originalColliderCenter.y / 2, originalColliderCenter.z);
+            float t = elapsed / duration;
+            _collider.height = Mathf.Lerp(startHeight, endHeight, t);
+            _collider.center = Vector3.Lerp(startCenter, endCenter, t);
+            elapsed += Time.deltaTime;
+            yield return null;
         }
-        else
-        {
-            // Restaurar a altura original do collider ao levantar
-            _collider.height = originalColliderHeight;
-            _collider.center = originalColliderCenter;
-        }
+
+        _collider.height = endHeight;
+        _collider.center = endCenter;
     }
 
     private void CheckGroundStatus()
     {
-        Vector3 rayStart = transform.position + Vector3.up * 0.1f; // Ajusta levemente para cima para evitar colisão com o próprio jogador
+        Vector3 rayStart = transform.position + Vector3.up * 0.1f; 
         bool hitGround = Physics.Raycast(rayStart, -Vector3.up, out RaycastHit hit, groundCheckDistance, groundLayer);
         Debug.DrawRay(rayStart, -Vector3.up * groundCheckDistance, hitGround ? Color.green : Color.red);
 
