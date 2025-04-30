@@ -402,6 +402,26 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 91da0a24-1955-4275-a6d6-8258d0e9302d
     m_ActionName: Player/Sprint
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 180687504832944842}
+        m_TargetAssemblyTypeName: InputHandler, Assembly-CSharp
+        m_MethodName: OnEquipWeapon
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: d93f07c1-f61c-4f61-a80d-c82ac897de51
+    m_ActionName: 'Player/Equip Weapon[/Keyboard/q]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 2ae0eccd-1d9d-4984-b8ce-d0be49d8342b
+    m_ActionName: 'Player/Block[/Mouse/rightButton]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -431,11 +451,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 938e5850e72b8c24d8de3dcc4367aa4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionDistance: 2
+  interactionDistance: 0.5
   capsuleRadius: 0.4
   interactableLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 1537
 --- !u!114 &6382720934198574392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1910,6 +1930,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5654299728731408219}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 33d9713335ba8a9418671006eabeaca1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9079576600542752810}
   m_SourcePrefab: {fileID: 100100000, guid: 33d9713335ba8a9418671006eabeaca1, type: 3}
 --- !u!4 &78700041047214240 stripped
 Transform:
@@ -2341,9 +2365,19 @@ MonoBehaviour:
   m_RigLayers:
   - m_Rig: {fileID: 8404626000338043895}
     m_Active: 1
-  - m_Rig: {fileID: 0}
-    m_Active: 1
   m_Effectors: []
+--- !u!114 &9079576600542752810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1764526433541195657}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d4b875b7b86cdd4ebf68127d19741f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1795604263860662605 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 889168663017999253, guid: 33d9713335ba8a9418671006eabeaca1,
@@ -3228,7 +3262,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: fd5ff891066137f4b937e74eebf54b97,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5689311127157651668, guid: fd5ff891066137f4b937e74eebf54b97,
         type: 3}
@@ -3270,6 +3304,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6199084233530523240}
     m_Modifications:
+    - target: {fileID: 1487363125332878862, guid: 98c5ce036f68d8941922e7541fb70887,
+        type: 3}
+      propertyPath: ExternalForcesModule.enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1487363125332878862, guid: 98c5ce036f68d8941922e7541fb70887,
+        type: 3}
+      propertyPath: ExternalForcesModule.influenceMask.m_Bits
+      value: 2001
+      objectReference: {fileID: 0}
+    - target: {fileID: 1578675634062532811, guid: 98c5ce036f68d8941922e7541fb70887,
+        type: 3}
+      propertyPath: ExternalForcesModule.enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1578675634062532811, guid: 98c5ce036f68d8941922e7541fb70887,
         type: 3}
       propertyPath: ColorModule.gradient.maxGradient.atime0
@@ -3317,6 +3366,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1578675634062532811, guid: 98c5ce036f68d8941922e7541fb70887,
         type: 3}
+      propertyPath: ExternalForcesModule.influenceMask.m_Bits
+      value: 2001
+      objectReference: {fileID: 0}
+    - target: {fileID: 1578675634062532811, guid: 98c5ce036f68d8941922e7541fb70887,
+        type: 3}
       propertyPath: ColorModule.gradient.maxGradient.m_NumAlphaKeys
       value: 2
       objectReference: {fileID: 0}
@@ -3324,6 +3378,11 @@ PrefabInstance:
         type: 3}
       propertyPath: ColorModule.gradient.maxGradient.m_NumColorKeys
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2981725133804311208, guid: 98c5ce036f68d8941922e7541fb70887,
+        type: 3}
+      propertyPath: ExternalForcesModule.enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2981725133804311208, guid: 98c5ce036f68d8941922e7541fb70887,
         type: 3}
@@ -3382,6 +3441,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2981725133804311208, guid: 98c5ce036f68d8941922e7541fb70887,
         type: 3}
+      propertyPath: ExternalForcesModule.influenceMask.m_Bits
+      value: 2001
+      objectReference: {fileID: 0}
+    - target: {fileID: 2981725133804311208, guid: 98c5ce036f68d8941922e7541fb70887,
+        type: 3}
       propertyPath: ColorModule.gradient.maxGradient.m_NumAlphaKeys
       value: 2
       objectReference: {fileID: 0}
@@ -3394,6 +3458,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922074810303694995, guid: 98c5ce036f68d8941922e7541fb70887,
+        type: 3}
+      propertyPath: ExternalForcesModule.enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922074810303694995, guid: 98c5ce036f68d8941922e7541fb70887,
+        type: 3}
+      propertyPath: ExternalForcesModule.influenceMask.m_Bits
+      value: 2001
       objectReference: {fileID: 0}
     - target: {fileID: 8295591563862043288, guid: 98c5ce036f68d8941922e7541fb70887,
         type: 3}

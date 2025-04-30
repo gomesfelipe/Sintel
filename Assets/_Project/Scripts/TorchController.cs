@@ -8,8 +8,7 @@ public class TorchController : MonoBehaviour
     [SerializeField] private Animator animator;
 
     [Header("Torch Settings")]
-    public bool hasTorch = false;
-    public bool torchActive = false;
+    public bool hasTorch = false, torchActive = false;
     public float maxFuel = 100f, fuelConsumptionRate = 5f, attackFuelCost = 10f, burnEffectiveness = 1f;
 
     private float currentFuel;
@@ -19,18 +18,16 @@ public class TorchController : MonoBehaviour
         inputHandler ??= GetComponent<InputHandler>();
         animator ??= GetComponentInChildren<Animator>();
         currentFuel = maxFuel;
-        UpdateTorchVisual();
+        UpdateTorchVisual(false);
     }
 
     private void Update()
     {
-        if (hasTorch && torchActive && inputHandler.FirePressed)
+        if (hasTorch && inputHandler.EquipWeapon)
         {
             ToggleTorch();
-            inputHandler.ClearFire();
+            if(torchActive){inputHandler.ClearFire();}   
         }
-
-
     }
     private void LateUpdate()
     {
@@ -40,33 +37,31 @@ public class TorchController : MonoBehaviour
         }
     }
 
-    private void ToggleTorch()
+private void ToggleTorch()
+{
+    if (!torchActive)
     {
-        if (!torchActive)
+        if (currentFuel > 0)
         {
-            if (currentFuel > 0)
-            {
-                torchActive = true;
-                UpdateTorchVisual();
-            }
-            else
-            {
-                Debug.Log("No fuel to active the torch!");
-            }
+            torchActive = true;
         }
         else
         {
-            torchActive = false;
-            UpdateTorchVisual();
+            Debug.Log("No fuel to activate the torch!");
         }
-
-        UpdateAnimator();
+    }
+    else
+    {
+        torchActive = false;
     }
 
-    private void UpdateTorchVisual()
+    UpdateTorchVisual(torchActive);
+    UpdateAnimator();
+}
+    public void UpdateTorchVisual(bool value)
     {
         if (torchVisual != null)
-            torchVisual.SetActive(torchActive);
+            torchVisual.SetActive(value);
     }
 
     private void UpdateAnimator()
@@ -85,12 +80,11 @@ public class TorchController : MonoBehaviour
         if (currentFuel <= 0)
         {
             currentFuel = 0;
-            torchActive = false;
-            UpdateTorchVisual();
+            UpdateTorchVisual(false);
             UpdateAnimator();
+            torchActive = false;
         }
     }
-
     public void TorchAttack()
     {
         if (!torchActive) return;
@@ -114,14 +108,13 @@ public class TorchController : MonoBehaviour
         if (target.TryGetComponent<IBurnable>(out var burnable))
         {
             burnable.StartBurn();
-            Debug.Log("Objeto começou a queimar pela tocha!");
+            Debug.Log("Objeto comecou a queimar pela tocha!");
         }
         else
         {
-            Debug.Log("O objeto não é queimável.");
+            Debug.Log("The object can't burn.");
         }
     }
-
 
     public void Refuel(float amount)
     {

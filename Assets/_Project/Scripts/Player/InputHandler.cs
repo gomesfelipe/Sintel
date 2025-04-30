@@ -12,7 +12,8 @@ public class InputHandler : MonoBehaviour
     public bool FirePressed { get; private set; }
     public bool FireCharging { get; private set; }
     public float FireChargeDuration { get; private set; }
-    public bool InteractPressed { get; internal set; }
+    public bool InteractPressed { get; private set; }
+    public bool EquipWeapon { get; private set; }
 
     public void OnMove(InputAction.CallbackContext context) => Move = context.ReadValue<Vector2>();
     public void OnLook(InputAction.CallbackContext context) => Look = context.ReadValue<Vector2>();
@@ -21,7 +22,7 @@ public class InputHandler : MonoBehaviour
     public void OnSprint(InputAction.CallbackContext context) => SprintHeld = context.performed;
 
     public void OnInteract(InputAction.CallbackContext context) => InteractPressed = context.performed;
-
+    public void OnEquipWeapon(InputAction.CallbackContext context) => EquipWeapon = context.performed;
     public void OnFire(InputAction.CallbackContext context)
     {
         switch (context.phase)
