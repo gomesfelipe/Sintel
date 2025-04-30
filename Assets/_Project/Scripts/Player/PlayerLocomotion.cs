@@ -95,6 +95,7 @@ public class PlayerLocomotion : MonoBehaviour
         {
             _anim.SetTrigger(AnimatorParams.Jumping);
             _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            if (isCrouching) { isCrouching = !isCrouching; }
         }
     }
 

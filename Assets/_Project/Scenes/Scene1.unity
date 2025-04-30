@@ -200,12 +200,6 @@ Transform:
   - {fileID: 466232314}
   m_Father: {fileID: 637771206}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &140970830 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 5032534029758302025, guid: 52391d7878090654399ff9bcecb0c20c,
-    type: 3}
-  m_PrefabInstance: {fileID: 2166026143483152964}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &204777965
 GameObject:
   m_ObjectHideFlags: 0
@@ -2368,7 +2362,7 @@ MonoBehaviour:
   m_StandbyUpdate: 2
   m_LookAt: {fileID: 759900994}
   m_Follow: {fileID: 759900994}
-  m_AnimatedTarget: {fileID: 140970830}
+  m_AnimatedTarget: {fileID: 0}
   m_LayerIndex: 0
   m_ShowDebugText: 0
   m_ChildCameras:
@@ -4050,16 +4044,6 @@ PrefabInstance:
       propertyPath: m_UIInputModule
       value: 
       objectReference: {fileID: 320878951}
-    - target: {fileID: 6382720934198574392, guid: 52391d7878090654399ff9bcecb0c20c,
-        type: 3}
-      propertyPath: crouchedHeight
-      value: 1.26
-      objectReference: {fileID: 0}
-    - target: {fileID: 6382720934198574392, guid: 52391d7878090654399ff9bcecb0c20c,
-        type: 3}
-      propertyPath: crouchedCenterY
-      value: 0.44
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
