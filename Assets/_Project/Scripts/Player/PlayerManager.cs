@@ -1,5 +1,7 @@
 using UnityEngine;
 
+namespace Rotwang.Sintel.Core.Player
+{
 public class PlayerManager : MonoBehaviour
 {
     [Header("References")]
@@ -67,25 +69,21 @@ public class PlayerManager : MonoBehaviour
 
     private void TryInteract()
     {
-        if (currentTarget == null) return;
+        if (currentTarget == null || InputHandler == null) return;
 
-        if (TorchController != null && TorchController.IsTorchActive() && TorchController.HasFuel())
+        if (currentTarget is IInteractable interactable)
         {
-            if (currentTarget is IBurnable burnable)
+            if (interactable.RequiresHoldToInteract())
             {
-                if (setObjOnFire != null)
-                {
-                    PlayAnimation(setObjOnFire);
-                }
-                burnable.StartBurn();
-                Debug.Log("The object started burning!");
-                return;
+                interactable.OnInteractHold(InputHandler.InteractPressed);
+            }
+            else if (InputHandler.InteractPressedDown)
+            {
+                interactable.OnInteract();
             }
         }
-
-        currentTarget.OnInteract();
-        Debug.Log("Interact");
     }
+
     private void OnDrawGizmos()
     {
         if (!Application.isPlaying) return;
@@ -102,4 +100,6 @@ public class PlayerManager : MonoBehaviour
     {
         Animator.CrossFade(animationClip.name, 0.2f);
     }
+}
+    
 }

@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Interactions;
 
+namespace Rotwang.Sintel.Core.Player
+{
 [RequireComponent(typeof(CapsuleCollider), typeof(Rigidbody))]
 public class PlayerLocomotion : MonoBehaviour
 {
@@ -27,7 +29,8 @@ public class PlayerLocomotion : MonoBehaviour
     private Coroutine crouchCoroutine;
 
     public float jumpForce = 5f, groundCheckDistance = 0.2f;
-    private bool isGrounded;
+    protected bool isGrounded;
+    public int SurfaceType { get; private set; } = 0; // 0 = indefinido, 1 = grass, 2 = wood
     public LayerMask groundLayer;
 
     private void Awake()
@@ -144,11 +147,17 @@ public class PlayerLocomotion : MonoBehaviour
 
         // Faz o SphereCast
         bool hitGround = Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit hit, groundCheckDistance + offset, groundLayer);
-
+        if (hitGround)
+        {
+                string tag = hit.collider.tag;
+            if (tag == "Grass") SurfaceType = 1;
+            else if (tag == "Wood") SurfaceType = 2;
+            else SurfaceType = 0;
+        }
         Debug.DrawRay(origin, Vector3.down * (groundCheckDistance + offset), hitGround ? Color.green : Color.red);
 
         isGrounded = hitGround;
         _anim.SetBool(AnimatorParams.IsGrounded, isGrounded);
     }
-
+}
 }

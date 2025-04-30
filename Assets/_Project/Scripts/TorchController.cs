@@ -1,6 +1,8 @@
 using UnityEngine;
 using System;
 
+namespace Rotwang.Sintel.Core.Player
+{
 public class TorchController : MonoBehaviour
 {
     [Header("References")]
@@ -150,4 +152,6 @@ public class TorchController : MonoBehaviour
     {
         return currentFuel > 0;
     }
+}
+    
 }

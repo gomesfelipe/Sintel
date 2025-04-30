@@ -1,5 +1,7 @@
 using UnityEngine;
-using System; 
+using System;
+using UnityEngine.UI;
+using Rotwang.Sintel.Core.Player;
 public enum BurnBehavior
 {
     Finite,
@@ -14,7 +16,19 @@ public class BurnableObject : MonoBehaviour, IBurnable
     protected float currentHealth;
     protected GameObject spawnedFlames;
     protected WindZone[] windZones;
+    
+    [Header("Hold to Burn")]
+    public bool requiresHoldToBurn = false;
+    public float holdDurationToIgnite = 2f;
+    [HideInInspector] public float currentHoldTime = 0f;
+    public bool RequiresHoldToInteract() => requiresHoldToBurn;
 
+    public float HoldDuration() => holdDurationToIgnite;
+    [Header("Burn UI")]
+    public Canvas burnCanvas;
+    public Slider burnSlider;
+    public bool CanBeIgnitedByHold => isBurning == false && requiresHoldToBurn;
+    
     [Header("Fire Propagation")]
     public bool isExplosive = false;
     public bool IsBurning() => isBurning;
@@ -28,10 +42,14 @@ public class BurnableObject : MonoBehaviour, IBurnable
     public int damageAmount = 10;
     [SerializeField] protected float damageTimer = 0f, explosionForce = 500f, upwardModifier = 1f;
     [SerializeField] protected bool isBurning = false;
-    
+
     private void Awake()
     {
         currentHealth = maxHealth;
+        burnCanvas ??= GetComponentInChildren<Canvas>();
+        if (burnCanvas != null) {
+            burnCanvas.gameObject.SetActive(false);
+        }
         if (isBurning)
         {
             StartBurn();
@@ -56,7 +74,15 @@ public class BurnableObject : MonoBehaviour, IBurnable
 
     public void OnInteract()
     {
-        Debug.Log("Objeto interagido, mas precisa de tocha ativa para queimar.");
+        if (!requiresHoldToBurn && CanBeBurned())
+        {
+            StartBurn();
+        }
+    }
+
+    public void OnInteractHold(bool isHolding)
+    {
+        UpdateHoldInteraction(isHolding, CanBeBurned());
     }
 
     public void TakeDamage(float damage)
@@ -78,7 +104,11 @@ public class BurnableObject : MonoBehaviour, IBurnable
         }
         OnStartBurn?.Invoke();
     }
-
+    private bool CanBeBurned()
+    {
+        TorchController torch = FindObjectOfType<TorchController>();
+        return torch != null && torch.IsTorchActive() && torch.HasFuel();
+    }
     private void ApplyBurnDamage(float damage)
     {
         if (burnBehavior == BurnBehavior.Infinite) return;
@@ -156,17 +186,6 @@ public class BurnableObject : MonoBehaviour, IBurnable
 
         return finalDirection;
     }
-    private void Die()
-    {
-        if (isExplosive)
-        {
-            Explode();
-        }
-        else
-        {
-            DestroyObject();
-        }
-    }
 
     private void Explode()
     {
@@ -204,8 +223,65 @@ public class BurnableObject : MonoBehaviour, IBurnable
 
         DestroyObject();
     }
+public void UpdateHoldInteraction(bool isHolding, bool hasTorch)
+{
+    if (!requiresHoldToBurn || isBurning)
+    {
+        ResetHoldUI();
+        return;
+    }
 
+    if (burnCanvas != null)
+        burnCanvas.gameObject.SetActive(isHolding);
 
+    if (!isHolding)
+    {
+        ResetHoldUI();
+        return;
+    }
+
+    if (hasTorch)
+    {
+        currentHoldTime += Time.deltaTime;
+
+        if (burnSlider != null)
+            burnSlider.value = Mathf.Clamp01(currentHoldTime / holdDurationToIgnite);
+
+        if (currentHoldTime >= holdDurationToIgnite)
+        {
+            StartBurn();
+            ResetHoldUI();
+        }
+    }
+    else
+    {
+        // Mantém a UI visível, mas sem progresso
+        if (burnSlider != null)
+            burnSlider.value = 0f;
+    }
+}
+
+    private void ResetHoldUI()
+    {
+        currentHoldTime = 0f;
+
+        if (burnSlider != null)
+            burnSlider.value = 0f;
+
+        if (burnCanvas != null)
+            burnCanvas.enabled = false;
+    }
+    private void Die()
+    {
+        if (isExplosive)
+        {
+            Explode();
+        }
+        else
+        {
+            DestroyObject();
+        }
+    }
     private void DestroyObject()
     {
         if (spawnedFlames != null)
@@ -241,6 +317,4 @@ public class BurnableObject : MonoBehaviour, IBurnable
         }
     #endif
     }
-
-
 }
