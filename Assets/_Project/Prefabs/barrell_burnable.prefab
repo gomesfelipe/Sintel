@@ -333,7 +333,7 @@ MonoBehaviour:
   damageInterval: 1
   damageAmount: 10
   damageTimer: 0
-  explosionForce: 15
+  explosionForce: 5
   upwardModifier: 0.5
   isBurning: 0
 --- !u!4 &4442379096452336909 stripped

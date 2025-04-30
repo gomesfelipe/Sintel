@@ -43,7 +43,7 @@ public class BurnableObject : MonoBehaviour, IBurnable
     {
         if (isBurning)
         {
-            ApplyBurnDamage();
+            ApplyBurnDamage(burnDamagePerSecond);
 
             propagationTimer += Time.deltaTime;
             if (propagationTimer >= propagationInterval)
@@ -59,7 +59,7 @@ public class BurnableObject : MonoBehaviour, IBurnable
         Debug.Log("Objeto interagido, mas precisa de tocha ativa para queimar.");
     }
 
-    public void TakeDamage()
+    public void TakeDamage(float damage)
     {
         StartBurn();
     }
@@ -79,11 +79,11 @@ public class BurnableObject : MonoBehaviour, IBurnable
         OnStartBurn?.Invoke();
     }
 
-    private void ApplyBurnDamage()
+    private void ApplyBurnDamage(float damage)
     {
         if (burnBehavior == BurnBehavior.Infinite) return;
 
-        currentHealth -= burnDamagePerSecond * Time.deltaTime;
+        currentHealth -= damage * Time.deltaTime;
 
         if (currentHealth <= 0)
         {
@@ -177,24 +177,28 @@ public class BurnableObject : MonoBehaviour, IBurnable
 
         Debug.Log($"{gameObject.name} explode!");
 
-        float explosionRadius = propagationRadius; // Pode usar o propagationRadius ou criar uma variável nova
-        LayerMask affectedLayers = burnableLayer; // Ou definir outra LayerMask específica para explosão
+        float explosionRadius = propagationRadius;
+        LayerMask affectedLayers = burnableLayer;
 
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, explosionRadius, affectedLayers);
 
         foreach (var hit in hitColliders)
         {
-            // Aplicar força
+            if (hit.gameObject == gameObject) continue;
+            if (hit.TryGetComponent<IDamageable>(out var damageable))
+            {
+                float distance = Vector3.Distance(transform.position, hit.transform.position);
+                float t = Mathf.Clamp01(distance / propagationRadius);
+                float scaledDamage = damageAmount * (1f - t);
+                if (scaledDamage > 0)
+                {
+                    damageable.TakeDamage(scaledDamage);
+                    Debug.Log($"{hit.name} recebeu {scaledDamage} de dano da explosão.");
+                }
+            }
             if (hit.attachedRigidbody != null)
             {
                 hit.attachedRigidbody.AddExplosionForce(explosionForce, transform.position, explosionRadius, upwardModifier, ForceMode.Impulse);
-            }
-
-            // Aplicar dano
-            if (hit.TryGetComponent<IDamageable>(out var damageable))
-            {
-                damageable.TakeDamage();
-                Debug.Log($"{hit.name} recebeu dano da explosão!");
             }
         }
 
@@ -210,7 +214,6 @@ public class BurnableObject : MonoBehaviour, IBurnable
         }
         Destroy(gameObject);
     }
-
     private void OnDrawGizmosSelected()
     {
     #if UNITY_EDITOR
@@ -219,6 +222,23 @@ public class BurnableObject : MonoBehaviour, IBurnable
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, damageRadius);
+
+        // Direções da explosão
+        Gizmos.color = Color.cyan;
+        int segments = 16; // número de setas
+        for (int i = 0; i < segments; i++)
+        {
+            float angle = i * Mathf.PI * 2f / segments;
+            Vector3 dir = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
+            Gizmos.DrawRay(transform.position, dir * damageRadius);
+        }
+
+        // Direção para cima (representa upwardModifier)
+        if (upwardModifier > 0)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawRay(transform.position, Vector3.up * upwardModifier);
+        }
     #endif
     }
 

@@ -1,17 +1,20 @@
 using UnityEngine;
+using System;
 
 public class TorchController : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private GameObject torchVisual;
-    [SerializeField] private InputHandler inputHandler;
+    [SerializeField] protected PlayerManager _manager;
     [SerializeField] private Animator animator;
+    [SerializeField] private GameObject torchVisual, flamesVisual;
+    [SerializeField] private InputHandler inputHandler;
 
     [Header("Torch Settings")]
     public bool hasTorch = false, torchActive = false;
+    private bool isConsumingFuel = false;
     public float maxFuel = 100f, fuelConsumptionRate = 5f, attackFuelCost = 10f, burnEffectiveness = 1f;
-
     private float currentFuel;
+    public event Action OnTorchActivated, OnTorchDeactivated;
 
     private void Awake()
     {
@@ -26,42 +29,52 @@ public class TorchController : MonoBehaviour
         if (hasTorch && inputHandler.EquipWeapon)
         {
             ToggleTorch();
-            if(torchActive){inputHandler.ClearFire();}   
+            if (torchActive)
+            {
+                UpdateTorchVisual(false);
+                UpdateAnimator();
+            }   
         }
     }
     private void LateUpdate()
     {
-        if (torchActive)
+        if (torchActive && isConsumingFuel)
         {
             ConsumeFuelOverTime();
         }
     }
-
-private void ToggleTorch()
-{
-    if (!torchActive)
+    private void SetTorchState(bool active)
     {
-        if (currentFuel > 0)
+        torchActive = active;
+        UpdateTorchVisual(active);
+        UpdateAnimator();
+
+        if (active)
+            OnTorchActivated?.Invoke();
+        else
+            OnTorchDeactivated?.Invoke();
+    }
+
+    private void ToggleTorch()
+    {
+        if (!torchActive && currentFuel > 0)
         {
-            torchActive = true;
+            SetTorchState(true);
+        }
+        else if (torchActive)
+        {
+            SetTorchState(false);
         }
         else
         {
             Debug.Log("No fuel to activate the torch!");
         }
     }
-    else
-    {
-        torchActive = false;
-    }
 
-    UpdateTorchVisual(torchActive);
-    UpdateAnimator();
-}
-    public void UpdateTorchVisual(bool value)
+    public void UpdateTorchVisual(bool visible)
     {
         if (torchVisual != null)
-            torchVisual.SetActive(value);
+            torchVisual.SetActive(visible);
     }
 
     private void UpdateAnimator()
@@ -71,7 +84,6 @@ private void ToggleTorch()
             animator.SetBool(AnimatorParams.HoldingTorch, torchActive);
         }
     }
-
     private void ConsumeFuelOverTime()
     {
         currentFuel -= fuelConsumptionRate * Time.deltaTime;
@@ -80,9 +92,8 @@ private void ToggleTorch()
         if (currentFuel <= 0)
         {
             currentFuel = 0;
-            UpdateTorchVisual(false);
-            UpdateAnimator();
-            torchActive = false;
+            SetTorchState(false);
+            StopConsumingFuel();
         }
     }
     public void TorchAttack()
@@ -120,7 +131,17 @@ private void ToggleTorch()
     {
         currentFuel = Mathf.Clamp(currentFuel + amount, 0, maxFuel);
     }
+    public void StartConsumingFuel()
+    {
+        isConsumingFuel = true;
+        flamesVisual.SetActive(true);
+    }
 
+    public void StopConsumingFuel()
+    {
+        isConsumingFuel = false;
+        flamesVisual.SetActive(false);
+    }
     public bool IsTorchActive()
     {
         return torchActive;

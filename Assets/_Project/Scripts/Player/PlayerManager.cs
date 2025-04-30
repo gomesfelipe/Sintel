@@ -26,6 +26,8 @@ public class PlayerManager : MonoBehaviour
     public Vector2 MoveInput => InputHandler?.Move ?? Vector2.zero;
     public Vector2 LookInput => InputHandler?.Look ?? Vector2.zero;
 
+    [SerializeField] protected AnimationClip setObjOnFire;
+
     private void Awake()
     {
         Rigidbody ??= GetComponent<Rigidbody>();
@@ -71,6 +73,10 @@ public class PlayerManager : MonoBehaviour
         {
             if (currentTarget is IBurnable burnable)
             {
+                if (setObjOnFire != null)
+                {
+                    PlayAnimation(setObjOnFire);
+                }
                 burnable.StartBurn();
                 Debug.Log("The object started burning!");
                 return;
@@ -90,5 +96,10 @@ public class PlayerManager : MonoBehaviour
             Gizmos.DrawSphere(targetPoint, 0.2f);
             Gizmos.DrawLine(_playerTransform.position + Vector3.up * 0.1f, targetPoint);
         }
+    }
+
+    public void PlayAnimation(AnimationClip animationClip)
+    {
+        Animator.CrossFade(animationClip.name, 0.2f);
     }
 }
