@@ -40,7 +40,7 @@ public class PlayerAnimationManager : MonoBehaviour
         if (torchRenderer != null)
         {
             torchRenderer.TrySetPropertyValue("_BaseColor", baseTorchColor);
-            torchRenderer.ApplyPropertiesToBlock(); // <- FORÇA atualização visual
+            torchRenderer.ApplyPropertiesToBlock();
         }
 
         if (torchController != null && torchController.IsTorchActive())
@@ -53,8 +53,8 @@ public class PlayerAnimationManager : MonoBehaviour
     {
         if (torchRenderer != null)
         {
-            torchRenderer.TrySetPropertyValue("_BaseColor", burnedTorchColor);
-            torchRenderer.ApplyPropertiesToBlock();
+                torchRenderer.TrySetPropertyValue("_BaseColor", burnedTorchColor);
+                torchRenderer.ApplyPropertiesToBlock();
         }
 
         if (torchController != null)

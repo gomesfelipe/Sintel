@@ -1422,6 +1422,33 @@ Transform:
   - {fileID: 362591513}
   m_Father: {fileID: 1617061503}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &572820062 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3957908626283812791, guid: 69b402cd8462b5a4b8cc0309af825088,
+    type: 3}
+  m_PrefabInstance: {fileID: 2328152242647462502}
+  m_PrefabAsset: {fileID: 0}
+--- !u!135 &572820069
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 572820062}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.015
+  m_Center: {x: 0, y: 0, z: 0.0057}
 --- !u!1 &596345839
 GameObject:
   m_ObjectHideFlags: 3
@@ -4253,6 +4280,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1945827343281565736, guid: 52391d7878090654399ff9bcecb0c20c,
+        type: 3}
+      propertyPath: materialProperties.Array.data[0].materialId
+      value: -1
+      objectReference: {fileID: 0}
     - target: {fileID: 2967622722847986390, guid: 52391d7878090654399ff9bcecb0c20c,
         type: 3}
       propertyPath: m_Name
@@ -4313,6 +4345,21 @@ PrefabInstance:
       propertyPath: m_UIInputModule
       value: 
       objectReference: {fileID: 320878951}
+    - target: {fileID: 9079576600542752810, guid: 52391d7878090654399ff9bcecb0c20c,
+        type: 3}
+      propertyPath: burnedTorchColor.b
+      value: 0.40771723
+      objectReference: {fileID: 0}
+    - target: {fileID: 9079576600542752810, guid: 52391d7878090654399ff9bcecb0c20c,
+        type: 3}
+      propertyPath: burnedTorchColor.g
+      value: 0.4889286
+      objectReference: {fileID: 0}
+    - target: {fileID: 9079576600542752810, guid: 52391d7878090654399ff9bcecb0c20c,
+        type: 3}
+      propertyPath: burnedTorchColor.r
+      value: 0.5849056
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4326,6 +4373,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1630568997693998838, guid: 69b402cd8462b5a4b8cc0309af825088,
+        type: 3}
+      propertyPath: m_PreserveAspect
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1792539870662879632, guid: 69b402cd8462b5a4b8cc0309af825088,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -4394,7 +4446,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3957908626283812791, guid: 69b402cd8462b5a4b8cc0309af825088,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 572820069}
   m_SourcePrefab: {fileID: 100100000, guid: 69b402cd8462b5a4b8cc0309af825088, type: 3}
 --- !u!1001 &3549342361377439730
 PrefabInstance:
@@ -4458,6 +4514,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: camp_fire_basic
+      objectReference: {fileID: 0}
+    - target: {fileID: 1115120327979639463, guid: 6cf8cb8903fc48442b988d322e1a45cf,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

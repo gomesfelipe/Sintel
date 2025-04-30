@@ -106,7 +106,7 @@ public class BurnableObject : MonoBehaviour, IBurnable
     }
     private bool CanBeBurned()
     {
-        TorchController torch = FindObjectOfType<TorchController>();
+        TorchController torch = FindFirstObjectByType<TorchController>();
         return torch != null && torch.IsTorchActive() && torch.HasFuel();
     }
     private void ApplyBurnDamage(float damage)
@@ -198,7 +198,6 @@ public class BurnableObject : MonoBehaviour, IBurnable
 
         float explosionRadius = propagationRadius;
         LayerMask affectedLayers = burnableLayer;
-
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, explosionRadius, affectedLayers);
 
         foreach (var hit in hitColliders)
@@ -220,56 +219,50 @@ public class BurnableObject : MonoBehaviour, IBurnable
                 hit.attachedRigidbody.AddExplosionForce(explosionForce, transform.position, explosionRadius, upwardModifier, ForceMode.Impulse);
             }
         }
-
         DestroyObject();
     }
-public void UpdateHoldInteraction(bool isHolding, bool hasTorch)
-{
-    if (!requiresHoldToBurn || isBurning)
+    public void UpdateHoldInteraction(bool isHolding, bool hasTorch)
     {
-        ResetHoldUI();
-        return;
-    }
-
-    if (burnCanvas != null)
-        burnCanvas.gameObject.SetActive(isHolding);
-
-    if (!isHolding)
-    {
-        ResetHoldUI();
-        return;
-    }
-
-    if (hasTorch)
-    {
-        currentHoldTime += Time.deltaTime;
-
-        if (burnSlider != null)
-            burnSlider.value = Mathf.Clamp01(currentHoldTime / holdDurationToIgnite);
-
-        if (currentHoldTime >= holdDurationToIgnite)
+        if (!requiresHoldToBurn || isBurning)
         {
-            StartBurn();
             ResetHoldUI();
+            return;
+        }
+        if (burnCanvas != null)
+            burnCanvas.gameObject.SetActive(isHolding);
+        if(burnSlider != null)
+            burnSlider.gameObject.SetActive(isHolding);
+        if (!isHolding)
+        {
+            ResetHoldUI();
+            return;
+        }
+        if (hasTorch)
+        {
+            currentHoldTime += Time.deltaTime;
+            if (burnSlider != null)
+                burnSlider.value = Mathf.Clamp01(currentHoldTime / holdDurationToIgnite);
+            if (currentHoldTime >= holdDurationToIgnite)
+            {
+                StartBurn();
+                ResetHoldUI();
+            }
+        }
+        else
+        {
+            if (burnSlider != null)
+                burnSlider.value = 0f;
         }
     }
-    else
-    {
-        // Mantém a UI visível, mas sem progresso
-        if (burnSlider != null)
-            burnSlider.value = 0f;
-    }
-}
 
     private void ResetHoldUI()
     {
         currentHoldTime = 0f;
-
         if (burnSlider != null)
+        {
             burnSlider.value = 0f;
-
-        if (burnCanvas != null)
-            burnCanvas.enabled = false;
+            burnCanvas.gameObject.SetActive(false);
+        }   
     }
     private void Die()
     {
@@ -289,6 +282,20 @@ public void UpdateHoldInteraction(bool isHolding, bool hasTorch)
             Destroy(spawnedFlames);
         }
         Destroy(gameObject);
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        currentHoldTime = 0f;
+
+        if (burnSlider != null)
+        {
+            burnSlider.value = 0f;
+            burnCanvas.gameObject.SetActive(false);
+        }
     }
     private void OnDrawGizmosSelected()
     {
