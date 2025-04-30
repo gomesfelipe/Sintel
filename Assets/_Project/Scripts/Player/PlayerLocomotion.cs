@@ -133,13 +133,19 @@ public class PlayerLocomotion : MonoBehaviour
 
     private void CheckGroundStatus()
     {
-        float capsuleBottom = transform.position.y + _collider.center.y - _collider.height / 2f;
-        Vector3 sphereCastOrigin = new Vector3(transform.position.x, capsuleBottom + 0.05f, transform.position.z);
+        if (_collider == null) return;
 
-        float sphereRadius = _collider.radius * 0.9f; // ligeiramente menor que o CapsuleCollider
-        bool hitGround = Physics.SphereCast(sphereCastOrigin, sphereRadius, Vector3.down, out RaycastHit hit, groundCheckDistance, groundLayer);
+        float radius = _collider.radius * 0.95f;
+        float offset = 0.03f;
 
-        Debug.DrawRay(sphereCastOrigin, Vector3.down * groundCheckDistance, hitGround ? Color.green : Color.red);
+        // Base real do capsule considerando o centro e altura
+        Vector3 capsuleBottom = transform.position + _collider.center - Vector3.up * (_collider.height / 2f - radius);
+        Vector3 origin = capsuleBottom + Vector3.up * offset;
+
+        // Faz o SphereCast
+        bool hitGround = Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit hit, groundCheckDistance + offset, groundLayer);
+
+        Debug.DrawRay(origin, Vector3.down * (groundCheckDistance + offset), hitGround ? Color.green : Color.red);
 
         isGrounded = hitGround;
         _anim.SetBool(AnimatorParams.IsGrounded, isGrounded);
