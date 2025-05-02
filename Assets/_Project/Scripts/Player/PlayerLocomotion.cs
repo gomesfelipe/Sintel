@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Interactions;
@@ -16,11 +17,10 @@ public class PlayerLocomotion : MonoBehaviour
     private CapsuleCollider _collider;
     public bool CanMove = true;
     protected Vector3 moveDirection = Vector3.zero;
-    public float rotationPower = 3f, rotationLerp = 0.5f;
-    public float moveSpeed = 5f, crouchSpeed=2f, sprintSpeed = 8f, rotationSpeed = 500f;
+    public float moveSpeed = 5f, crouchSpeed=2f, sprintSpeed = 8f, rotationSpeed = 500f, rotationPower = 3f, rotationLerp = 0.5f;
     public GameObject followTransform;
 
-    private bool isSprinting = false, isCrouching = false;
+    private bool isSprinting = false, isCrouching = false, hanging = false;
     private bool crouchToggledThisFrame = false;
     private float originalColliderHeight;
     [SerializeField] private float crouchedHeight = 0.875f;
@@ -32,7 +32,6 @@ public class PlayerLocomotion : MonoBehaviour
     protected bool isGrounded;
     public int SurfaceType { get; private set; } = 0; // 0 = indefinido, 1 = grass, 2 = wood
     public LayerMask groundLayer;
-
     private void Awake()
     {
         _inputHandler ??= GetComponent<InputHandler>();
@@ -53,6 +52,7 @@ public class PlayerLocomotion : MonoBehaviour
         HandleMovement();
         HandleRotation();
         HandleJump();
+        HandleGrab();
         if (_inputHandler.CrouchPressed && !crouchToggledThisFrame)
         {
             ToggleCrouch();
@@ -69,7 +69,7 @@ public class PlayerLocomotion : MonoBehaviour
         if (_inputHandler.Move.sqrMagnitude < 0.01)
         {
             moveDirection = Vector3.zero;
-            _anim.SetFloat(AnimatorParams.Speed, 0); // Idle
+            _anim.SetFloat(AnimatorParams.Speed, 0);
             return;
         }
 
@@ -91,16 +91,59 @@ public class PlayerLocomotion : MonoBehaviour
         Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
         _rb.rotation = Quaternion.RotateTowards(_rb.rotation, toRotation, rotationSpeed * Time.deltaTime);
     }
+    private void HandleGrab()
+    {
+            if (_rb.linearVelocity.y < 0 && !hanging)
+            {
+                Vector3 lineDownStart = (transform.position + Vector3.up * 1.5f) + transform.forward;
+                Vector3 LineDownEnd = (transform.position + Vector3.up * 0.7f) + transform.forward;
+                Physics.Linecast(lineDownStart, LineDownEnd, out RaycastHit downHit, groundLayer);
+                Debug.DrawLine(lineDownStart, LineDownEnd);
 
+                if (downHit.collider != null)
+                {
+                    Vector3 lineFwdStart = new(transform.position.x, downHit.point.y - 0.1f, transform.position.z);
+                    Vector3 LineFwdEnd = new Vector3(transform.position.x, downHit.point.y - 0.1f, transform.position.z) + transform.forward;
+                    Physics.Linecast(lineFwdStart, LineFwdEnd, out RaycastHit fwdHit, groundLayer);
+                    Debug.DrawLine(lineFwdStart, LineFwdEnd);
+
+                    if (fwdHit.collider != null)
+                    {
+                        _rb.useGravity = false;
+                        _rb.linearVelocity = Vector3.zero;
+
+                        hanging = true;
+
+                        Vector3 hangPos = new(fwdHit.point.x, downHit.point.y, fwdHit.point.z);
+                        Vector3 offset = transform.forward * -0.1f + transform.up * -1f;
+                        hangPos += offset;
+                        transform.position = hangPos;
+                        transform.forward = -fwdHit.normal;
+                        CanMove = false;
+                    }
+                }
+            }
+    }
     private void HandleJump()
     {
-        if (_inputHandler.JumpPressed && isGrounded)
-        {
-            _anim.SetTrigger(AnimatorParams.Jumping);
-            _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            if (isCrouching) { isCrouching = !isCrouching; }
+            if (_inputHandler.JumpPressed && (isGrounded || Mathf.Approximately(_rb.linearVelocity.y, 0)))
+            {
+                if (hanging)
+                {
+                    _rb.useGravity = true;
+                    hanging = false;
+                    _rb.linearVelocity = new Vector3(_rb.linearVelocity.x, jumpForce, _rb.linearVelocity.z);
+                    StartCoroutine(EnableCanMove(0.25f));
+                }
+                else
+                {
+                    _rb.linearVelocity = new Vector3(_rb.linearVelocity.x, jumpForce, _rb.linearVelocity.z);
+                }
+                if (isCrouching) { isCrouching = !isCrouching; }
+            }
+
+            if (Mathf.Abs(_rb.linearVelocity.x) + Mathf.Abs(_rb.linearVelocity.z) > 0.1f) transform.forward = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
         }
-    }
 
     private void ToggleCrouch()
     {
@@ -133,8 +176,13 @@ public class PlayerLocomotion : MonoBehaviour
         _collider.height = endHeight;
         _collider.center = endCenter;
     }
+    private IEnumerator EnableCanMove(float watiTime)
+        {
+            yield return new WaitForSeconds(watiTime);
+            CanMove = true;
+        }
 
-    private void CheckGroundStatus()
+        private void CheckGroundStatus()
     {
         if (_collider == null) return;
 

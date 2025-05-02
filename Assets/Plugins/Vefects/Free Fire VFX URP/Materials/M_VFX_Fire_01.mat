@@ -9,6 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: M_VFX_Fire_01
   m_Shader: {fileID: 4800000, guid: b8a99704b1204314e816971e63a2a521, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 0
@@ -20,6 +22,7 @@ Material:
   disabledShaderPasses:
   - DistortionVectors
   - TransparentBackface
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -127,6 +130,7 @@ Material:
     - _Power: 1
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _ReceiveShadows: 1
     - _ReceivesSSR: 0
     - _RenderQueueType: 4
     - _RequireSplitLighting: 0
@@ -163,7 +167,7 @@ Material:
     - _ZWrite1: 0
     - __dirty: 0
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 0}
+    - _Color: {r: 1, g: 0.75294125, b: 0, a: 1}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _MaskMoveScale: {r: 1, g: 1, b: 0, a: 0}
@@ -185,3 +189,4 @@ Material:
     - _Noise_02_Scale: {r: 1, g: 1, b: 0, a: 0}
     - _Noise_02_Speed: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
