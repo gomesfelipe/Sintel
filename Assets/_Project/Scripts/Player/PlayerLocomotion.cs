@@ -20,7 +20,7 @@ public class PlayerLocomotion : MonoBehaviour
     public float moveSpeed = 5f, crouchSpeed=2f, sprintSpeed = 8f, rotationSpeed = 500f, rotationPower = 3f, rotationLerp = 0.5f;
     public GameObject followTransform;
 
-    private bool isSprinting = false, isCrouching = false, hanging = false;
+    private bool isSprinting = false, isCrouching = false, isHanging = false;
     private bool crouchToggledThisFrame = false;
     private float originalColliderHeight;
     [SerializeField] private float crouchedHeight = 0.875f;
@@ -30,8 +30,13 @@ public class PlayerLocomotion : MonoBehaviour
 
     public float jumpForce = 5f, groundCheckDistance = 0.2f;
     protected bool isGrounded;
+    public bool IsGrounded => isGrounded;
     public int SurfaceType { get; private set; } = 0; // 0 = indefinido, 1 = grass, 2 = wood
-    public LayerMask groundLayer;
+   [SerializeField] private float hangOffsetY = -1.5f;
+   [SerializeField] private float hangOffsetZ = -0.1f;
+   [SerializeField] private float grabCheckHeightTop = 1.5f;
+   [SerializeField] private float grabCheckHeightBottom = 0.7f;
+   public LayerMask groundLayer;
     private void Awake()
     {
         _inputHandler ??= GetComponent<InputHandler>();
@@ -53,12 +58,7 @@ public class PlayerLocomotion : MonoBehaviour
         HandleRotation();
         HandleJump();
         HandleGrab();
-        if (_inputHandler.CrouchPressed && !crouchToggledThisFrame)
-        {
-            ToggleCrouch();
-            crouchToggledThisFrame = true;
-            _inputHandler.ClearCrouch();
-        }
+        HandleCrouchInput();
     }
 
     private void HandleMovement()
@@ -87,13 +87,13 @@ public class PlayerLocomotion : MonoBehaviour
 
     private void HandleRotation()
     {
-        if (moveDirection == Vector3.zero) return;
+        if (moveDirection == Vector3.zero || isHanging || !CanMove) return;
         Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
         _rb.rotation = Quaternion.RotateTowards(_rb.rotation, toRotation, rotationSpeed * Time.deltaTime);
     }
     private void HandleGrab()
     {
-            if (_rb.linearVelocity.y < 0 && !hanging)
+            if (_rb.linearVelocity.y < 0 && !isHanging)
             {
                 Vector3 lineDownStart = (transform.position + Vector3.up * 1.5f) + transform.forward;
                 Vector3 LineDownEnd = (transform.position + Vector3.up * 0.7f) + transform.forward;
@@ -112,10 +112,10 @@ public class PlayerLocomotion : MonoBehaviour
                         _rb.useGravity = false;
                         _rb.linearVelocity = Vector3.zero;
 
-                        hanging = true;
-
+                        isHanging = true;
+                        _anim.SetBool(AnimatorParams.IsHanging, isHanging);
                         Vector3 hangPos = new(fwdHit.point.x, downHit.point.y, fwdHit.point.z);
-                        Vector3 offset = transform.forward * -0.1f + transform.up * -1f;
+                        Vector3 offset = transform.forward * hangOffsetZ + transform.up * hangOffsetY;
                         hangPos += offset;
                         transform.position = hangPos;
                         transform.forward = -fwdHit.normal;
@@ -128,10 +128,11 @@ public class PlayerLocomotion : MonoBehaviour
     {
             if (_inputHandler.JumpPressed && (isGrounded || Mathf.Approximately(_rb.linearVelocity.y, 0)))
             {
-                if (hanging)
+                if (isHanging)
                 {
                     _rb.useGravity = true;
-                    hanging = false;
+                    isHanging = false;
+                    _anim.SetBool(AnimatorParams.IsHanging, isHanging);
                     _rb.linearVelocity = new Vector3(_rb.linearVelocity.x, jumpForce, _rb.linearVelocity.z);
                     StartCoroutine(EnableCanMove(0.25f));
                 }
@@ -144,8 +145,16 @@ public class PlayerLocomotion : MonoBehaviour
 
             if (Mathf.Abs(_rb.linearVelocity.x) + Mathf.Abs(_rb.linearVelocity.z) > 0.1f) transform.forward = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
         }
-
-    private void ToggleCrouch()
+        private void HandleCrouchInput()
+        {
+            if (_inputHandler.CrouchPressed && !crouchToggledThisFrame)
+            {
+                ToggleCrouch();
+                crouchToggledThisFrame = true;
+                _inputHandler.ClearCrouch();
+            }
+        }
+        private void ToggleCrouch()
     {
         isCrouching = !isCrouching;
         _anim.SetBool(AnimatorParams.IsCrouching, isCrouching);
